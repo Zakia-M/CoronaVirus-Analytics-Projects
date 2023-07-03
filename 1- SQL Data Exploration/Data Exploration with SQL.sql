@@ -13,6 +13,64 @@ Order by 3,4
 Select * From PortfolioProject..CovidVaccinations
 Order by 3,4
 
+-- Table Information : 
+
+SELECT *
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidDeaths'
+
+SELECT *
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidVaccinations'
+
+
+
+SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidDeaths'
+
+SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidVaccinations'
+
+
+
+-- Show the Number of Columns
+SELECT count (*) as NumberOFColumns
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidDeaths'
+
+-- Show the Number of Columns
+SELECT count (*) as NumberOFColumns
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidVaccinations'
+
+
+
+-- Show the Number of Columns for Each Data Type
+SELECT DATA_TYPE, count (*) as NumberOfColumns
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidDeaths'
+Group by DATA_TYPE
+
+-- Show the Number of Columns for Each Data Type
+SELECT DATA_TYPE, count (*) as NumberOfColumns
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE table_name = 'CovidVaccinations'
+Group by DATA_TYPE
+
+
+
+-- Show the Number of Rows 
+SELECT count (*) as NumberOfRows
+FROM CovidDeaths
+
+-- Show the Number of Rows 
+SELECT count (*) as NumberOfRows
+FROM CovidVaccinations
+
+
+
 -- Show the Data that we are going to use
 Select Location, date, total_cases, new_cases, total_deaths, population
 From PortfolioProject..CovidDeaths
@@ -20,6 +78,7 @@ Where continent is not null
 -- because when continent is null, the location is replaced by the continent name
 order by 1,2
 
+----------------------------------------------------------------------------------------------------------------
 -- Total Cases vs Total Deaths
 -- Shows the likelihood of dying if someone contracts covid
 Select Location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
@@ -27,6 +86,7 @@ From PortfolioProject..CovidDeaths
 Where continent is not null 
 order by 1,2
 
+----------------------------------------------------------------------------------------------------------------
 -- Total Cases vs Population
 -- Shows percentages of the population infected with Covid
 Select Location, date, Population, total_cases, (total_cases/population)*100 as PercentPopulationInfected
@@ -34,6 +94,7 @@ From PortfolioProject..CovidDeaths
 Where continent is not null 
 order by 1,2
 
+----------------------------------------------------------------------------------------------------------------
 -- Countries with Highest Infection Rate compared to Population
 Select Location, Population, total_cases
 From PortfolioProject..CovidDeaths
@@ -51,6 +112,7 @@ Where continent is not null
 Group by Location, Population
 order by PercentPopulationInfected desc
 
+----------------------------------------------------------------------------------------------------------------
 -- Countries with Highest Death Count per Population
 Select Location, Population, MAX(cast(total_deaths as int)) as HighestNumberOfDeaths,  Max((total_deaths/population))*100 as PercentPopulationDead
 From PortfolioProject..CovidDeaths
@@ -65,6 +127,7 @@ Where continent is not null
 Group by Location
 order by TotalDeathCount desc
 
+----------------------------------------------------------------------------------------------------------------
 -- Let's Group by Continent
 -- Showing contintents with the highest death count per population
 Select Continent, MAX(cast(Total_deaths as int))as TotalDeathCount
@@ -79,6 +142,7 @@ Where continent is null
 Group by Location
 order by TotalDeathCount desc
 
+----------------------------------------------------------------------------------------------------------------
 ---- Global Statistics
 
 -- The percentage of new deaths/new cases per day across the world
@@ -90,6 +154,7 @@ From PortfolioProject..CovidDeaths
 Group by date
 order by Date desc
 
+----------------------------------------------------------------------------------------------------------------
 -- The total percentage of new deaths/new cases across the world
 Select sum(new_cases) as TotalCases,
 sum(cast(new_deaths as int)) as TotalDeaths, 
@@ -110,6 +175,7 @@ Join PortfolioProject..CovidVaccinations vac
 	On dea.location = vac.location
 	and dea.date = vac.date
 
+----------------------------------------------------------------------------------------------------------------
 -- Total Population vs Vaccinations
 -- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
@@ -125,6 +191,7 @@ where dea.continent is not null
 order by 2,3
 
 
+----------------------------------------------------------------------------------------------------------------
 -- Using CTE (Common Table Expression) to perform Calculation on Partition By in previous query
 
 With PopvsVac (Continent, Location, Date, Population, New_Vaccinations, RollingPeopleVaccinated)
@@ -142,7 +209,7 @@ where dea.continent is not null
 Select *, (RollingPeopleVaccinated/Population)*100 as PercentPopulationVaccinated
 From PopvsVac
 
-
+----------------------------------------------------------------------------------------------------------------
 -- Using Temp Table to perform Calculation on Partition By in previous query
 
 DROP Table if exists #PercentPopulationVaccinated
@@ -168,7 +235,7 @@ Select *, (RollingPeopleVaccinated/Population)*100 as PercentPopulationVaccinate
 From #PercentPopulationVaccinated
 order by 2,3
 
-
+----------------------------------------------------------------------------------------------------------------
 ------ Using Temp Table to store the result of the previous query
 --SELECT 
 --    *, (RollingPeopleVaccinated/Population)*100 as PercentPopulationVaccinated
@@ -180,6 +247,7 @@ order by 2,3
 --SELECT * From #PercentPopulationVaccinated2
 
 
+----------------------------------------------------------------------------------------------------------------
 -- Creating View to store data for later visualizations
 
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
